@@ -68,13 +68,14 @@ function M.mousepressed(x, y, button)
     end
 end    
 
+local font = love.graphics.newFont(30)
 function M.draw()
     for k,v in ipairs(Options) do
         love.graphics.setColor(v.isHovered and colorLight or color)
         love.graphics.rectangle('fill', v.x1, v.y1, width, height-delta, 5, 5)
         love.graphics.setColor(1, 1, 1)
-        love.graphics.setNewFont(30)
-        love.graphics.printf(v.title, v.x1, v.y1, width, 'center')
+        love.graphics.setFont(font)
+        love.graphics.printf(v.title, v.x1, (v.y1 + v.y2 - font:getHeight(v.title)) / 2, width, 'center')
     end
 end
 
