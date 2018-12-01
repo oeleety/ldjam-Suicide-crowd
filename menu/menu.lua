@@ -1,57 +1,81 @@
 local M = {}
 
+local height = 64
+local width = 300
+local delta=4
+local x1=config.windowWidth/3
+local x2=config.windowWidth/3+width
+local color= {0, 0.6, 0.4}
+local colorLight= {0, 0.4, 0.4}
+
 local Options={
-    {name='play', title='Play the game!'},
-    {name='highscore', title='Highscore'},
-    {name='quit', title='Quit'}
+    {name='play', title='Play the game!', 
+    x1=x1, x2=x2,
+    y1=config.windowHeight/3,
+    y2=config.windowHeight/3+height-delta,
+    color=color,
+    colorLight=colorLight,
+    isHovered=false,
+    action=function() states.changeState('game') end}, 
+
+    {name='highscore', title='Highscore',
+    x1=x1, x2=x2,
+    y1=config.windowHeight/3+height,
+    y2=config.windowHeight/3+2*height-delta,
+    color=color,
+    colorLight=colorLight,
+    isHovered=false,
+    action=function() states.changeState('highscore') end},
+
+    {name='quit', title='Quit',
+    x1=x1, x2=x2,
+    y1=config.windowHeight/3+2*height,
+    y2=config.windowHeight/3+3*height-delta,
+    color=color,
+    colorLight=colorLight,
+    isHovered=false,
+    action=function() love.event.quit() end}
   }
 
 function M.load(settigns)
 end
 
+function isHoveredNow(k)
+    local xMouse, yMouse = love.mouse.getPosition()
+        if xMouse >= k.x1 and xMouse <= k.x2
+            and yMouse >= k.y1 and yMouse <= k.y2
+        then out=true
+        else out=false
+        end
+    return out
+end
+
 function M.update(dt)
+    for k,v in ipairs(Options) do
+        v.isHovered = isHoveredNow(v)
+    end
 
 end
 
-local height = 64
-local width = 300
-
-local startX=config.windowWidth/3
-local startY=config.windowHeight/3
-local delta=4
-
 function M.mousepressed(x, y, button)
-    if button == 1
-    and x >= startX and x < startX + width
-    and y >= startY and y < startY + height-delta
-   then 
-        print("game")
-   end
-   if button == 1
-    and x >= startX and x < startX + width
-    and y >= startY + height and y < startY+height*1 + height-delta
-    then print("highscore")
+    for k,v in ipairs(Options) do
+        if button==1
+        and x >= v.x1 and x < v.x2
+        and y >= v.y1 and y < v.y2
+        then    
+            v.action()
+        end
     end
-    if button == 1
-    and x >= startX and x < startX + width
-    and y >= startY+height*2 and y < startY+height*2 + height-delta
-    then print("quick")
-    end
-end 
-
+end    
 
 function M.draw()
-
     for k,v in ipairs(Options) do
-        local x=startX
-        local y=config.windowHeight/3+height*(k-1)
-        love.graphics.setColor(0, (0.4*2*k)%1, 0.4)
-        love.graphics.rectangle('fill', x, y, width, height-delta, 5, 5)
+        love.graphics.setColor(v.isHovered and colorLight or color)
+        love.graphics.rectangle('fill', v.x1, v.y1, width, height-delta, 5, 5)
         love.graphics.setColor(1, 1, 1)
         love.graphics.setNewFont(30)
-        love.graphics.printf(v.title, x, y, width, 'center')
+        love.graphics.printf(v.title, v.x1, v.y1, width, 'center')
     end
-
 end
 
 return M
