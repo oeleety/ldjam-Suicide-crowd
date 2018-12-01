@@ -12,7 +12,7 @@ end
 
 local function createItem(x, y)
     local res = {}
-    res.body = love.physics.newBody(M.world, x, y, "dynamic")
+    res.body = love.physics.newBody(M.game.world, x, y, "dynamic")
     res.body:setFixedRotation(true)
     res.shape = love.physics.newRectangleShape(10, 15)
     res.fixture = love.physics.newFixture(res.body, res.shape, 0.1)
@@ -32,12 +32,12 @@ local function addItem(item)
     M.nextItemNum = M.nextItemNum + 1
 end
 
-function M.create(world, count)
-    M.world = world
+function M.create(game, count)
+    M.game = game
     M.nextItemNum = 0
     for i = 1, count do
         x, y = love.math.random(-10, 10), love.math.random(-20, 20)
-        addItem(createItem(config.windowWidth/2 + x, config.windowHeight/2 + y))
+        addItem(createItem(config.windowWidth/2 + x, game.worldHeight/2 + y))
     end
 end
 
@@ -51,6 +51,18 @@ function M.draw()
     for _, v in pairs(M.items) do
         v.draw()
     end
+end
+
+function M.getPosition()
+    x, y = 0, 0
+    count = 0
+    for _, v in pairs(M.items) do
+        x1, y1 = v.body:getPosition()
+        x = x + x1
+        y = y + y1
+        count = count + 1
+    end
+    return x / count, y / count
 end
 
 return M
