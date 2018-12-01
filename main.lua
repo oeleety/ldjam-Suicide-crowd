@@ -2,6 +2,7 @@
 states = require("states")
 
 function love.keypressed(key)
+    states.keypressed(key)
 end
 
 function love.mousepressed(x,y,button)

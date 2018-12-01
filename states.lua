@@ -23,6 +23,10 @@ function M.draw()
     M.allStates[M.state].draw()
 end
 
+function M.keypressed(key)
+    callIfExists(M.allStates[M.state].keypressed, key)
+end
+
 function M.mousepressed(x, y, button)
     callIfExists(M.allStates[M.state].mousepressed, x, y, button)
 end

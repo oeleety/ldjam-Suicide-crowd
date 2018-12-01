@@ -134,4 +134,10 @@ function M.mousereleased(x, y, button)
     end
 end
 
+function M.keypressed(key)
+    if key == 'escape' then
+        states.changeState('menu')
+    end
+end
+
 return M
