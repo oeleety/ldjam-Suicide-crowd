@@ -30,7 +30,7 @@ local function createItem(x, y)
     function res.update(dt)
         if res.isInCrowd then moveItem(res, 2000 * dt) end
     end
-    return res;
+    return res
 end
 
 function M.init(game)

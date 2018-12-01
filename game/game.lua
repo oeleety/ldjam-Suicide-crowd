@@ -5,6 +5,7 @@ local utils = require("utils")
 
 local crowd = require("game/crowd").init(M)
 local bombs = require("game/bombs").init(M)
+local border = require("game/border").init(M)
 
 M.worldHeight = 800
 
@@ -48,6 +49,7 @@ function M.load(settings)
 
     crowd.createCrowd(100)
     bombs.createBomb(600, 600)
+     border.createBorder(0,0)
 
     M.world:setCallbacks(beginContact)
 end
