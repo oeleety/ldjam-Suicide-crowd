@@ -1,7 +1,8 @@
 local M = {}
 
-M.items = {}
-local force = 2000
+utils = require("utils")
+
+local itemIdGen = utils.createIdGenerator('human')
 
 local function moveItem(item, force)
     if love.keyboard.isDown('w') then item.body:applyForce(0, -force) end
@@ -16,51 +17,42 @@ local function createItem(x, y)
     res.body:setFixedRotation(true)
     res.shape = love.physics.newRectangleShape(10, 15)
     res.fixture = love.physics.newFixture(res.body, res.shape, 0.1)
+
+    res.body:setUserData(itemIdGen())
+    res.fixture:setUserData({ group='human', mask={ bombs='explosion', explosionPart='death' }})
+
     function res.draw()
         love.graphics.setColor(1, 1, 1)
         love.graphics.polygon("fill", res.body:getWorldPoints(res.shape:getPoints())) 
     end
     function res.update(dt)
-        moveItem(res, force * dt)
+        moveItem(res, 2000 * dt)
     end
     return res;
 end
 
-local function addItem(item)
-    item.fixture:setUserData(M.nextItemNum)
-    M.items[M.nextItemNum] = item 
-    M.nextItemNum = M.nextItemNum + 1
+function M.init(game)
+    M.game = game
+    return M
 end
 
-function M.create(game, count)
-    M.game = game
-    M.nextItemNum = 0
+function M.createCrowd(count)
     for i = 1, count do
         x, y = love.math.random(-10, 10), love.math.random(-20, 20)
-        addItem(createItem(config.windowWidth/2 + x, game.worldHeight/2 + y))
-    end
-end
-
-function M.update(dt)
-    for _, v in pairs(M.items) do
-        v.update(dt)
-    end
-end
-
-function M.draw()
-    for _, v in pairs(M.items) do
-        v.draw()
+        utils.addGameObject(M.game.objects, createItem(config.windowWidth/2 + x, M.game.worldHeight/2 + y))
     end
 end
 
 function M.getPosition()
     x, y = 0, 0
     count = 0
-    for _, v in pairs(M.items) do
-        x1, y1 = v.body:getPosition()
-        x = x + x1
-        y = y + y1
-        count = count + 1
+    for k, v in pairs(M.game.objects) do
+        if utils.startsWith(k, 'human') then
+            bx, by = v.body:getPosition()
+            x = x + bx
+            y = y + by
+            count = count + 1
+        end
     end
     return x / count, y / count
 end
