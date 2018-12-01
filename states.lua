@@ -19,4 +19,8 @@ function M.draw()
     M.allStates[M.state].draw()
 end
 
+function M.mousepressed(x, y, button)
+    M.allStates[M.state].mousepressed(x, y, button)
+end
+
 return M
