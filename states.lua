@@ -6,6 +6,10 @@ M.allStates = {
     highscore=require('highscore/highscore')
 }
 
+local function callIfExists(fn, ...)
+    if fn then fn(...) end
+end
+
 function M.changeState(newState, settings)
     M.state = newState
     M.allStates[M.state].load(settings)
@@ -20,7 +24,12 @@ function M.draw()
 end
 
 function M.mousepressed(x, y, button)
-    M.allStates[M.state].mousepressed(x, y, button)
+    callIfExists(M.allStates[M.state].mousepressed, x, y, button)
 end
+
+function M.mousereleased(x, y, button, istouch, presses)
+    callIfExists(M.allStates[M.state].mousereleased, x, y, button, istouch, presses)
+end
+
 
 return M

@@ -21,12 +21,14 @@ local function createItem(x, y)
     res.body:setUserData(itemIdGen())
     res.fixture:setUserData({ group='human', mask={ bombs='explosion', explosionPart='death' }})
 
+    res.isInCrowd = true
+
     function res.draw()
         love.graphics.setColor(1, 1, 1)
         love.graphics.polygon("fill", res.body:getWorldPoints(res.shape:getPoints())) 
     end
     function res.update(dt)
-        moveItem(res, 2000 * dt)
+        if res.isInCrowd then moveItem(res, 2000 * dt) end
     end
     return res;
 end
@@ -55,6 +57,17 @@ function M.getPosition()
         end
     end
     return x / count, y / count
+end
+
+function M.getGuyAt(x, y)
+    for k, v in pairs(M.game.objects) do
+        if utils.startsWith(k, 'human') and v.isInCrowd then
+            if v.fixture:testPoint(x, y) then
+                return v
+            end
+        end
+    end
+    return nil
 end
 
 return M

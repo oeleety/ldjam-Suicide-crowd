@@ -3,8 +3,13 @@ states = require("states")
 
 function love.keypressed(key)
 end
+
 function love.mousepressed(x,y,button)
     states.mousepressed(x, y, button)
+end
+
+function love.mousereleased(x, y, button, istouch, presses)
+    states.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.load()

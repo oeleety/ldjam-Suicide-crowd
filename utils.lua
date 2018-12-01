@@ -13,6 +13,10 @@ function M.normalizeVector(x, y)
     return x / len, y / len
 end
 
+function M.getNormalVector(x, y)
+    return -y, x
+end
+
 function M.getObjectId(o)
     return o.body:getUserData()
 end
