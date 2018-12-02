@@ -7,6 +7,7 @@ local crowd = require("game/crowd").init(M)
 local bombs = require("game/bombs").init(M)
 local border = require("game/border").init(M)
 local bear = require("game/bear").init(M)
+local screaming = love.audio.newSource("game/sounds/Screaming.ogg", "static")
 
 M.worldHeight = 800
 
@@ -187,7 +188,7 @@ function M.mousereleased(x, y, button)
         if M.selected then
             M.selected.body:setLinearVelocity(getSelectedForceVector(x, y))
             M.selected.isInCrowd = false
-
+            screaming :play ()
             M.selected = nil
         end
     end
