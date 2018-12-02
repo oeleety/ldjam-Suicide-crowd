@@ -9,19 +9,27 @@ local border = require("game/border").init(M)
 
 M.worldHeight = 800
 
+local function isObjectDestroyed(id)
+    return M.objectsToDestroy[id] ~= nil
+end
+
 local function beginContact(a, b, coll)
     local aData, bData = a:getUserData(), b:getUserData()
+    local aId, bId = utils.getFixtureId(a), utils.getFixtureId(b)
+    if isObjectDestroyed(aId) or isObjectDestroyed(bId) then
+        return
+    end
     if aData.mask[bData.group] == 'explosion' then
-        M.destroyObject(utils.getFixtureId(a))
-        M.destroyObject(utils.getFixtureId(b))
+        M.destroyObject(aId)
+        M.destroyObject(bId)
 
         x, y = a:getBody():getPosition()
         v = {x=x, y=y}
         M.futureExplosions[v] = v
     elseif aData.mask[bData.group] == 'kill' then
-        M.destroyObject(utils.getFixtureId(b))
+        M.destroyObject(bId)
     elseif aData.mask[bData.group] == 'death' then
-        M.destroyObject(utils.getFixtureId(a))
+        M.destroyObject(aId)
     end
 end
 
@@ -48,8 +56,7 @@ function M.load(settings)
     M.objectsToDestroy = {}
 
     crowd.createCrowd(100)
-    bombs.createBomb(600, 600)
-     border.createBorder(0,0)
+    border.createBorder(0,0)
 
     M.world:setCallbacks(beginContact)
 end
@@ -67,11 +74,14 @@ function M.update(dt)
         v.update(dt)
     end
 
+    crowdPosX, crowdPosY = crowd.getPosition()
+
     doDestroy()
     startExplosions()
     crowd.updateAskedPosition()
+    bombs.createNextBombsIfNeeded(crowdPosX)
 
-    M.cam:setPosition(crowd.getPosition())
+    M.cam:setPosition(crowdPosX, crowdPosY)
 end
 
 local function getSelectedForceVector(mouseX, mouseY)
