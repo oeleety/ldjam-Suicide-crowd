@@ -129,7 +129,7 @@ function M.getGuyAt(x, y)
         if v.fixture:testPoint(x, y) then
             return v
         end
-    end)
+    end, true)
 end
 
 function M.updateCrowdCount()
