@@ -1,14 +1,50 @@
 local M = {}
 
-utils = require("utils")
+local utils = require("utils")
 
 local itemIdGen = utils.createIdGenerator('human')
 
-local function moveItem(item, force)
-    if love.keyboard.isDown('w') then item.body:applyForce(0, -force) end
-    if love.keyboard.isDown('a') then item.body:applyForce(-force, 0) end
-    if love.keyboard.isDown('s') then item.body:applyForce(0, force) end
-    if love.keyboard.isDown('d') then item.body:applyForce(force, 0) end
+local function iterateOverCrowd(fn)
+    for k, v in pairs(M.game.objects) do
+        if utils.startsWith(k, 'human') then
+            r = fn(v)
+            if r then return r end
+        end
+    end
+    return nil
+end
+
+function M.setAskedPosition(x, y)
+    M.askedPosition = {x = x, y = y}
+end
+
+function M.updateAskedPosition()
+    if M.askedPosition then
+        local xA = M.askedPosition.x
+        local yA = M.askedPosition.y
+
+        local sumDist = 0
+        local count = 0
+        iterateOverCrowd(function(v)
+            local x, y = v.body:getPosition()
+            sumDist = sumDist + utils.getVectorLen(x - xA, y - yA)
+            count = count + 1
+        end)
+
+        if sumDist / count < 50 then
+            M.askedPosition = nil
+        end
+    end
+end
+
+local function moveItem(item, dt)
+    if M.askedPosition then
+        x, y = item.body:getPosition()
+        xDiff, yDiff = utils.normalizeVector(M.askedPosition.x - x, M.askedPosition.y - y)
+        item.body:setLinearVelocity(xDiff * dt * 10000, yDiff * dt * 10000)
+    else
+        item.body:setLinearVelocity(0, 0)
+    end
 end
 
 local function createItem(x, y)
@@ -28,7 +64,7 @@ local function createItem(x, y)
         love.graphics.polygon("fill", res.body:getWorldPoints(res.shape:getPoints())) 
     end
     function res.update(dt)
-        if res.isInCrowd then moveItem(res, 2000 * dt) end
+        if res.isInCrowd then moveItem(res, dt) end
     end
     return res
 end
@@ -46,28 +82,23 @@ function M.createCrowd(count)
 end
 
 function M.getPosition()
-    x, y = 0, 0
-    count = 0
-    for k, v in pairs(M.game.objects) do
-        if utils.startsWith(k, 'human') then
-            bx, by = v.body:getPosition()
-            x = x + bx
-            y = y + by
-            count = count + 1
-        end
-    end
+    local x, y = 0, 0
+    local count = 0
+    iterateOverCrowd(function(v)
+        bx, by = v.body:getPosition()
+        x = x + bx
+        y = y + by
+        count = count + 1
+    end)
     return x / count, y / count
 end
 
 function M.getGuyAt(x, y)
-    for k, v in pairs(M.game.objects) do
-        if utils.startsWith(k, 'human') and v.isInCrowd then
-            if v.fixture:testPoint(x, y) then
-                return v
-            end
+    return iterateOverCrowd(function(v)
+        if v.fixture:testPoint(x, y) then
+            return v
         end
-    end
-    return nil
+    end)
 end
 
 return M

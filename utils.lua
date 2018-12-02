@@ -8,8 +8,12 @@ function M.cartesianFromPolar(r, theta)
     return r * math.cos(theta), r * math.sin(theta)
 end
 
+function M.getVectorLen(x, y)
+    return math.sqrt(x * x + y * y)
+end
+
 function M.normalizeVector(x, y)
-    local len = math.sqrt(x * x + y * y)
+    local len = M.getVectorLen(x, y)
     return x / len, y / len
 end
 

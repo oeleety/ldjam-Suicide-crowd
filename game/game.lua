@@ -69,14 +69,15 @@ function M.update(dt)
 
     doDestroy()
     startExplosions()
+    crowd.updateAskedPosition()
 
     M.cam:setPosition(crowd.getPosition())
 end
 
 local function getSelectedForceVector(mouseX, mouseY)
     local x, y = M.cam:toWorld(mouseX, mouseY)
-    local x, y = utils.normalizeVector(x - M.selected.body:getX(), y - M.selected.body:getY())
-    return x * 100, y * 100
+    local x, y = x - M.selected.body:getX(), y - M.selected.body:getY()
+    return x, y
 end
 
 local function drawArrow(x1, y1, x2, y2)
@@ -122,13 +123,15 @@ function M.mousepressed(x, y, button)
     if button == 1 then
         x, y = M.cam:toWorld(x,y)
         M.selected = crowd.getGuyAt(x, y)
+    elseif button == 2 then
+        crowd.setAskedPosition(M.cam:toWorld(x,y))
     end
 end
 
 function M.mousereleased(x, y, button)
     if button == 1 then
         if M.selected then
-            M.selected.body:applyForce(getSelectedForceVector(x, y))
+            M.selected.body:setLinearVelocity(getSelectedForceVector(x, y))
             M.selected.isInCrowd = false
 
             M.selected = nil
