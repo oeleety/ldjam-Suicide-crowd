@@ -43,7 +43,7 @@ function M.updateAskedPosition()
             count = count + 1
         end)
 
-        if sumDist / count < count / 1.3 then
+        if sumDist / count < 3.5 * math.pow(count, 2/3) then
             M.askedPosition = nil
         end
     end

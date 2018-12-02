@@ -12,6 +12,7 @@ end
 local function createBearObj(x, y)
     local res = {}
     res.body = love.physics.newBody(M.game.world, x, y, "dynamic")
+    res.body:setFixedRotation(true)
     res.shape = love.physics.newRectangleShape(100, 200)
     res.fixture = love.physics.newFixture(res.body, res.shape)
     res.animation = animation.Animation:new(imageBear, 100, 200, 1)
