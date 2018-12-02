@@ -3,9 +3,12 @@ local M = {}
 local utils = require("utils")
 local animation = require("game/animation")
 
+require("libs/slam")
+
 local bombIdGen = utils.createIdGenerator('bomb')
 local explosionIdGen = utils.createIdGenerator('explosion')
 local imageBomb = love.graphics.newImage("game/images/bomb.png")
+local soundBomb = love.audio.newSource("game/sounds/bomb.wav", "static")
 
 function M.init(game)
     M.game = game
@@ -73,7 +76,10 @@ function M.createExplosion(x, y)
     for i = 0, 60 do
         xPart, yPart = utils.cartesianFromPolar(love.math.random(0.1, 10), (i / 50) * 2 * math.pi)
         utils.addGameObject(M.game.objects, createExplosionPart(x + xPart, y + yPart, x, y))
+        
     end
+    soundBomb :play()
+    
 end
 
 -- TODO: increase number of bombs with time
