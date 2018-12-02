@@ -3,41 +3,41 @@ local M = {}
 local height = 64
 local width = 300
 local delta=4
-local x1=config.windowWidth/3
-local x2=config.windowWidth/3+width
 local color= {0, 0.6, 0.4}
 local colorLight= {0, 0.4, 0.4}
 
-local Options={
-    {name='play', title='Play the game!', 
-    x1=x1, x2=x2,
-    y1=config.windowHeight/3,
-    y2=config.windowHeight/3+height-delta,
-    color=color,
-    colorLight=colorLight,
-    isHovered=false,
-    action=function() states.changeState('game') end}, 
-
-    {name='highscore', title='Highscore',
-    x1=x1, x2=x2,
-    y1=config.windowHeight/3+height,
-    y2=config.windowHeight/3+2*height-delta,
-    color=color,
-    colorLight=colorLight,
-    isHovered=false,
-    action=function() states.changeState('highscore') end},
-
-    {name='quit', title='Quit',
-    x1=x1, x2=x2,
-    y1=config.windowHeight/3+2*height,
-    y2=config.windowHeight/3+3*height-delta,
-    color=color,
-    colorLight=colorLight,
-    isHovered=false,
-    action=function() love.event.quit() end}
-  }
 
 function M.load(settigns)
+    local x1=config.windowWidth/2 - width/2
+    local x2=config.windowWidth/2 + width/2
+    M.Options={
+        {name='play', title='Play the game!', 
+        x1=x1, x2=x2,
+        y1=config.windowHeight/3,
+        y2=config.windowHeight/3+height-delta,
+        color=color,
+        colorLight=colorLight,
+        isHovered=false,
+        action=function() states.changeState('game') end}, 
+
+        {name='highscore', title='Highscore',
+        x1=x1, x2=x2,
+        y1=config.windowHeight/3+height,
+        y2=config.windowHeight/3+2*height-delta,
+        color=color,
+        colorLight=colorLight,
+        isHovered=false,
+        action=function() states.changeState('highscore') end},
+
+        {name='quit', title='Quit',
+        x1=x1, x2=x2,
+        y1=config.windowHeight/3+2*height,
+        y2=config.windowHeight/3+3*height-delta,
+        color=color,
+        colorLight=colorLight,
+        isHovered=false,
+        action=function() love.event.quit() end}
+    }
 end
 
 function isHoveredNow(k)
@@ -51,14 +51,14 @@ function isHoveredNow(k)
 end
 
 function M.update(dt)
-    for k,v in ipairs(Options) do
+    for k,v in ipairs(M.Options) do
         v.isHovered = isHoveredNow(v)
     end
 
 end
 
 function M.mousepressed(x, y, button)
-    for k,v in ipairs(Options) do
+    for k,v in ipairs(M.Options) do
         if button==1
         and x >= v.x1 and x < v.x2
         and y >= v.y1 and y < v.y2
@@ -70,7 +70,7 @@ end
 
 local font = love.graphics.newFont(30)
 function M.draw()
-    for k,v in ipairs(Options) do
+    for k,v in ipairs(M.Options) do
         love.graphics.setColor(v.isHovered and colorLight or color)
         love.graphics.rectangle('fill', v.x1, v.y1, width, height-delta, 5, 5)
         love.graphics.setColor(1, 1, 1)

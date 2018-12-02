@@ -1,6 +1,6 @@
 local M = {}
 
-M.infinity=1e6
+M.infinity=1e5
 
 function M.startsWith(str, start)
    return str:sub(1, #start) == start

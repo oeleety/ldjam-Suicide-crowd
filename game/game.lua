@@ -6,6 +6,7 @@ local utils = require("utils")
 local crowd = require("game/crowd").init(M)
 local bombs = require("game/bombs").init(M)
 local border = require("game/border").init(M)
+local bear = require("game/bear").init(M)
 
 M.worldHeight = 800
 
@@ -24,6 +25,13 @@ local function isObjectDestroyed(id)
     return M.objectsToDestroy[id] ~= nil
 end
 
+local function triggerExplosion(a, aId)
+    M.destroyObject(aId)
+    x, y = a:getBody():getPosition()
+    v = {x=x, y=y}
+    M.futureExplosions[v] = v
+end
+
 local function beginContact(a, b, coll)
     local aData, bData = a:getUserData(), b:getUserData()
     local aId, bId = utils.getFixtureId(a), utils.getFixtureId(b)
@@ -31,12 +39,9 @@ local function beginContact(a, b, coll)
         return
     end
     if aData.mask[bData.group] == 'explosion' then
-        M.destroyObject(aId)
-        M.destroyObject(bId)
-
-        x, y = a:getBody():getPosition()
-        v = {x=x, y=y}
-        M.futureExplosions[v] = v
+        triggerExplosion(a, aId)
+    elseif aData.mask[bData.group] == 'triggerExplosion' then
+        triggerExplosion(b, bId)
     elseif aData.mask[bData.group] == 'kill' then
         M.destroyObject(bId)
     elseif aData.mask[bData.group] == 'death' then
@@ -60,8 +65,8 @@ function M.load(settings)
     bombs.load()
     crowd.load()
 
-    M.cam = gamera.new(0, 0, 1e309, M.worldHeight)
-    M.cam:setWindow(0,0,1000,500)
+    M.cam = gamera.new(0, 0, utils.infinity, M.worldHeight)
+    M.cam:setWindow(0,0,config.windowWidth,config.windowHeight)
 
     M.world = love.physics.newWorld(0, 0, true)
 
@@ -70,6 +75,7 @@ function M.load(settings)
     M.objectsToDestroy = {}
 
     crowd.createCrowd(100)
+    bear.createBear(300, M.worldHeight / 2)
     border.createBorders()
 
     M.score = 0
@@ -92,7 +98,13 @@ function M.update(dt)
         v.update(dt)
     end
 
-    crowdPosX, crowdPosY = crowd.getPosition()
+    local crowdPosX, crowdPosY = crowd.getPosition()
+
+    local bearX, bearY = M.objects.bear.body:getPosition()
+    local dX, dY = utils.normalizeVector(crowdPosX - bearX, crowdPosY - bearY)
+    local maxCoef = 150
+    local curCoef = math.min(M.score / 18, maxCoef)
+    M.objects.bear.body:setLinearVelocity(dX * curCoef, dY * curCoef)
 
     doDestroy()
     startExplosions()

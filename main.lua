@@ -1,5 +1,6 @@
 
 states = require("states")
+config = {}
 
 function love.keypressed(key)
     states.keypressed(key)
@@ -14,6 +15,9 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.load()
+    config.windowWidth = love.graphics.getWidth()
+    config.windowHeight = love.graphics.getHeight()
+
     states.changeState('menu')
 end
 

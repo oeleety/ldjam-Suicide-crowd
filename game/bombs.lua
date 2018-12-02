@@ -13,7 +13,7 @@ function M.init(game)
 end
 
 function M.load()
-    M.lastBombsX = 700
+    M.lastBombsX = 1300
 end
 
 local function createBombObj(x, y)
@@ -25,7 +25,7 @@ local function createBombObj(x, y)
     res.animation = animation.Animation:new(imageBomb, 12, 12, 1)
 
     res.body:setUserData(bombIdGen())
-    res.fixture:setUserData({ group='bombs', mask={ human='explosion', explosionPart='explosion' }})
+    res.fixture:setUserData({ group='bombs', mask={ human='explosion', explosionPart='explosion', bear='explosion' }})
 
     function res.draw()
         love.graphics.setColor(1, 1, 1)
@@ -51,7 +51,7 @@ local function createExplosionPart(x, y, xCenter, yCenter)
     res.fixture:setSensor(true)
 
     res.body:setUserData(explosionIdGen())
-    res.fixture:setUserData({ group='explosionPart', mask={ human='kill', bombs='kill' }})
+    res.fixture:setUserData({ group='explosionPart', mask={ human='kill', bombs='triggerExplosion' }})
 
     xDiff, yDiff = utils.normalizeVector(x - xCenter, y - yCenter)
     res.body:setLinearVelocity(xDiff * love.math.random(100, 500), yDiff * love.math.random(100, 500));

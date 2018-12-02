@@ -59,7 +59,7 @@ local function createItem(x, y)
     res.animation = animation.Animation:new(image, 10, 15, 0.3)
 
     res.body:setUserData(itemIdGen())
-    res.fixture:setUserData({ group='human', mask={ bombs='explosion', explosionPart='death' }})
+    res.fixture:setUserData({ group='human', mask={ bombs='triggerExplosion', explosionPart='death', bear='death' }})
 
     res.isInCrowd = true
 
@@ -91,7 +91,7 @@ end
 function M.createCrowd(count)
     for i = 1, count do
         x, y = love.math.random(-10, 10), love.math.random(-20, 20)
-        utils.addGameObject(M.game.objects, createItem(config.windowWidth/2 + x, M.game.worldHeight/2 + y))
+        utils.addGameObject(M.game.objects, createItem(1000 + x, M.game.worldHeight/2 + y))
     end
 end
 
