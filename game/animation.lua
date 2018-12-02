@@ -24,9 +24,7 @@ end
 
 function M.Animation:update(dt)
     self.currentTime = self.currentTime + dt
-    if self.currentTime >= self.duration then
-        self.currentTime = self.currentTime - self.duration
-    end
+    self.currentTime = math.fmod(self.currentTime, self.duration)
 end
 
 function M.Animation:draw(x, y)

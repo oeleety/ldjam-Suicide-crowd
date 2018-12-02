@@ -16,7 +16,7 @@ local function createBorder(x,y,borderWidth,borderHeight)
     res.fixture = love.physics.newFixture(res.body, res.shape)
 
     res.body:setUserData(borderIdGen())
-    res.fixture:setUserData({ group='border', mask={ bombs='explosion', explosionPart='death' }})
+    res.fixture:setUserData({ group='border', mask={}})
 
     function res.draw()
         love.graphics.setColor(0, 0.8, 0.4)
@@ -36,5 +36,3 @@ function M.createBorders()
 end
 
 return M
-
-
