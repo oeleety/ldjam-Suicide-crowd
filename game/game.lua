@@ -67,7 +67,7 @@ function M.load(settings)
     M.objectsToDestroy = {}
 
     crowd.createCrowd(100)
-    border.createBorder(0,0)
+    border.createBorders()
 
     M.score = 0
     M.crowdCount = 0

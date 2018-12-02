@@ -9,25 +9,30 @@ function M.init(game)
     return M
 end
 
-local function createBorder(x,y)
+local function createBorder(x,y,borderWidth,borderHeight)
     local res = {}
-    res.body=love.physics.newBody(M.game.world, x,y)
-    res.shape = love.physics.newRectangleShape(1000, 100)
+    res.body=love.physics.newBody(M.game.world, x+borderWidth/2,y+borderHeight/2)
+    res.shape = love.physics.newRectangleShape(borderWidth, borderHeight)
     res.fixture = love.physics.newFixture(res.body, res.shape)
 
     res.body:setUserData(borderIdGen())
     res.fixture:setUserData({ group='border', mask={ bombs='explosion', explosionPart='death' }})
 
     function res.draw()
-        love.graphics.setColor(0.5, 1, 1)
-        love.graphics.polygon("fill", res.body:getWorldPoints(res.shape:getPoints()))
+        love.graphics.setColor(0, 0.8, 0.4)
+        local l, t, w, h = M.game.cam:getVisible()
+        love.graphics.rectangle("fill", utils.findCross(l,t,w,h, x, y,borderWidth, borderHeight))
     end
-    function res.update(dt) end--??
+    function res.update(dt) end
     return res
 end
 
-function M.createBorder(x, y)
-    utils.addGameObject(M.game.objects, createBorder(x, y))
+function M.createBorders()
+    borderHeight=30
+    
+    utils.addGameObject(M.game.objects, createBorder(0, 0, utils.infinity,borderHeight))
+    utils.addGameObject(M.game.objects, createBorder(0, M.game.worldHeight-borderHeight, utils.infinity, borderHeight))
+    utils.addGameObject(M.game.objects, createBorder(0, 0, borderHeight, M.game.worldHeight))
 end
 
 return M
