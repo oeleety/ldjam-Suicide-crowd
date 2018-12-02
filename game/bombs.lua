@@ -9,8 +9,11 @@ local imageBomb = love.graphics.newImage("game/images/bomb.png")
 
 function M.init(game)
     M.game = game
-    M.lastBombsX = 600
     return M
+end
+
+function M.load()
+    M.lastBombsX = 700
 end
 
 local function createBombObj(x, y)
@@ -67,7 +70,7 @@ local function createExplosionPart(x, y, xCenter, yCenter)
 end
 
 function M.createExplosion(x, y)
-    for i = 0, 100 do
+    for i = 0, 60 do
         xPart, yPart = utils.cartesianFromPolar(love.math.random(0.1, 10), (i / 50) * 2 * math.pi)
         utils.addGameObject(M.game.objects, createExplosionPart(x + xPart, y + yPart, x, y))
     end

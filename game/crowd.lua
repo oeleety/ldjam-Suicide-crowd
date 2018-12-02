@@ -69,7 +69,7 @@ local function createItem(x, y)
     end
     function res.update(dt)
         velX, velY = res.body:getLinearVelocity()
-        if velX ~= 0 or velY ~= 0 then
+        if math.abs(velX) > 0.01 or math.abs(velY) > 0.01 then
             res.animation:update(dt)
         else
             res.animation:reset()
@@ -82,6 +82,10 @@ end
 function M.init(game)
     M.game = game
     return M
+end
+
+function M.load()
+    M.askedPosition = nil
 end
 
 function M.createCrowd(count)

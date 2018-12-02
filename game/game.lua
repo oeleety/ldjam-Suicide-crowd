@@ -57,6 +57,9 @@ function M.destroyObject(id)
 end
 
 function M.load(settings)
+    bombs.load()
+    crowd.load()
+
     M.cam = gamera.new(0, 0, 1e309, M.worldHeight)
     M.cam:setWindow(0,0,1000,500)
 
