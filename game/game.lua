@@ -14,7 +14,7 @@ M.worldHeight = 800
 function M.recalculateStatistics()
     M.crowdCount = crowd.updateCrowdCount()
     if M.crowdCount == 0 then
-        states.changeState('menu', {score=M.score})
+        states.changeState('highscore', {score=M.score})
     end
     x = crowd.getPosition()
     if x ~= nil then
@@ -101,11 +101,13 @@ function M.update(dt)
 
     local crowdPosX, crowdPosY = crowd.getPosition()
 
-    local bearX, bearY = M.objects.bear.body:getPosition()
-    local dX, dY = utils.normalizeVector(crowdPosX - bearX, crowdPosY - bearY)
-    local maxCoef = 150
-    local curCoef = math.min(M.score / 18, maxCoef)
-    M.objects.bear.body:setLinearVelocity(dX * curCoef, dY * curCoef)
+    if crowdPosX and crowdPosY then
+        local bearX, bearY = M.objects.bear.body:getPosition()
+        local dX, dY = utils.normalizeVector(crowdPosX - bearX, crowdPosY - bearY)
+        local maxCoef = 150
+        local curCoef = math.min(M.score / 18, maxCoef)
+        M.objects.bear.body:setLinearVelocity(dX * curCoef, dY * curCoef)
+    end
 
     doDestroy()
     startExplosions()
