@@ -1,10 +1,20 @@
 local M = {}
 
+require("libs/slam")
+
 local utils = require("utils")
 local animation = require("game/animation")
+local soundManager = require("game/soundManager")
 
 local itemIdGen = utils.createIdGenerator('human')
 local image = love.graphics.newImage("game/images/human.png")
+
+local sounds = {
+    love.audio.newSource("game/sounds/step_cloth1.ogg", "static"),
+    love.audio.newSource("game/sounds/step_cloth2.ogg", "static"),
+    love.audio.newSource("game/sounds/step_cloth3.ogg", "static"),
+    love.audio.newSource("game/sounds/step_cloth4.ogg", "static"),
+}
 
 local function iterateOverCrowd(fn, includeAll)
     for k, v in pairs(M.game.objects) do
@@ -57,6 +67,7 @@ local function createItem(x, y)
     res.shape = love.physics.newRectangleShape(10, 15)
     res.fixture = love.physics.newFixture(res.body, res.shape, 0.1)
     res.animation = animation.Animation:new(image, 10, 15, 0.3)
+    res.sounds = soundManager.Manager:new(sounds, love.math.random(0.5, 1))
 
     res.body:setUserData(itemIdGen())
     res.fixture:setUserData({ group='human', mask={ bombs='triggerExplosion', explosionPart='death', bear='death' }})
@@ -71,8 +82,10 @@ local function createItem(x, y)
         velX, velY = res.body:getLinearVelocity()
         if math.abs(velX) > 0.01 or math.abs(velY) > 0.01 then
             res.animation:update(dt)
+            res.sounds:update(dt)
         else
             res.animation:reset()
+            res.sounds:reset()
         end
         if res.isInCrowd then moveItem(res, dt) end
     end
