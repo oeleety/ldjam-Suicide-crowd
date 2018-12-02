@@ -1,8 +1,10 @@
 local M = {}
 
 local utils = require("utils")
+local animation = require("game/animation")
 
 local itemIdGen = utils.createIdGenerator('human')
+local image = love.graphics.newImage("game/images/human.png")
 
 local function iterateOverCrowd(fn, includeAll)
     for k, v in pairs(M.game.objects) do
@@ -54,6 +56,7 @@ local function createItem(x, y)
     res.body:setFixedRotation(true)
     res.shape = love.physics.newRectangleShape(10, 15)
     res.fixture = love.physics.newFixture(res.body, res.shape, 0.1)
+    res.animation = animation.Animation:new(image, 10, 15, 0.3)
 
     res.body:setUserData(itemIdGen())
     res.fixture:setUserData({ group='human', mask={ bombs='explosion', explosionPart='death' }})
@@ -62,9 +65,15 @@ local function createItem(x, y)
 
     function res.draw()
         love.graphics.setColor(1, 1, 1)
-        love.graphics.polygon("fill", res.body:getWorldPoints(res.shape:getPoints())) 
+        res.animation:draw(res.body:getX() - 10 / 2, res.body:getY() - 15 / 2)
     end
     function res.update(dt)
+        velX, velY = res.body:getLinearVelocity()
+        if velX ~= 0 or velY ~= 0 then
+            res.animation:update(dt)
+        else
+            res.animation:reset()
+        end
         if res.isInCrowd then moveItem(res, dt) end
     end
     return res
