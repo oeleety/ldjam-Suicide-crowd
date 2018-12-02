@@ -1,9 +1,11 @@
 local M = {}
 
 local utils = require("utils")
+local animation = require("game/animation")
 
 local bombIdGen = utils.createIdGenerator('bomb')
 local explosionIdGen = utils.createIdGenerator('explosion')
+local imageBomb = love.graphics.newImage("game/images/bomb.png")
 
 function M.init(game)
     M.game = game
@@ -14,18 +16,21 @@ end
 local function createBombObj(x, y)
     local res = {}
     res.body = love.physics.newBody(M.game.world, x, y)
-    res.shape = love.physics.newCircleShape(15)
+    res.shape = love.physics.newCircleShape(12)
     res.fixture = love.physics.newFixture(res.body, res.shape)
     res.fixture:setSensor(true)
+    res.animation = animation.Animation:new(imageBomb, 12, 12, 1)
 
     res.body:setUserData(bombIdGen())
     res.fixture:setUserData({ group='bombs', mask={ human='explosion', explosionPart='explosion' }})
 
     function res.draw()
-        love.graphics.setColor(1, 0, 0)
-        love.graphics.circle("fill", res.body:getX(), res.body:getY(), res.shape:getRadius())
+        love.graphics.setColor(1, 1, 1)
+        res.animation:draw(res.body:getX(), res.body:getY())
     end
-    function res.update(dt) end
+    function res.update(dt)
+        res.animation:update(dt)
+    end
     return res;
 end
 
@@ -38,7 +43,7 @@ local function createExplosionPart(x, y, xCenter, yCenter)
 
     local res = {}
     res.body = love.physics.newBody(M.game.world, x, y, 'dynamic')
-    res.shape = love.physics.newCircleShape(5)
+    res.shape = love.physics.newCircleShape(2.5)
     res.fixture = love.physics.newFixture(res.body, res.shape)
     res.fixture:setSensor(true)
 
@@ -62,7 +67,7 @@ local function createExplosionPart(x, y, xCenter, yCenter)
 end
 
 function M.createExplosion(x, y)
-    for i = 0, 50 do
+    for i = 0, 100 do
         xPart, yPart = utils.cartesianFromPolar(love.math.random(0.1, 10), (i / 50) * 2 * math.pi)
         utils.addGameObject(M.game.objects, createExplosionPart(x + xPart, y + yPart, x, y))
     end

@@ -65,7 +65,7 @@ local function createItem(x, y)
 
     function res.draw()
         love.graphics.setColor(1, 1, 1)
-        res.animation:draw(res.body:getX() - 10 / 2, res.body:getY() - 15 / 2)
+        res.animation:draw(res.body:getX(), res.body:getY())
     end
     function res.update(dt)
         velX, velY = res.body:getLinearVelocity()
