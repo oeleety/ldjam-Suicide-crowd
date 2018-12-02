@@ -4,9 +4,9 @@ local utils = require("utils")
 
 local itemIdGen = utils.createIdGenerator('human')
 
-local function iterateOverCrowd(fn)
+local function iterateOverCrowd(fn, includeAll)
     for k, v in pairs(M.game.objects) do
-        if utils.startsWith(k, 'human') then
+        if utils.startsWith(k, 'human') and (includeAll or v.isInCrowd) then
             r = fn(v)
             if r then return r end
         end
@@ -90,7 +90,11 @@ function M.getPosition()
         y = y + by
         count = count + 1
     end)
-    return x / count, y / count
+    if count == 0 then
+        return nil, nil
+    else
+        return x / count, y / count
+    end
 end
 
 function M.getGuyAt(x, y)
@@ -99,6 +103,12 @@ function M.getGuyAt(x, y)
             return v
         end
     end)
+end
+
+function M.getCrowdCount()
+    local count = 0
+    iterateOverCrowd(function() count = count + 1 end)
+    return count
 end
 
 return M

@@ -9,6 +9,17 @@ local border = require("game/border").init(M)
 
 M.worldHeight = 800
 
+function M.recalculateStatistics()
+    M.crowdCount = crowd.getCrowdCount()
+    if M.crowdCount == 0 then
+        states.changeState('menu', {score=M.score})
+    end
+    x = crowd.getPosition()
+    if x ~= nil then
+        M.score = math.floor(math.max(x - M.initialPositionX, M.score) + 0.5)
+    end
+end
+
 local function isObjectDestroyed(id)
     return M.objectsToDestroy[id] ~= nil
 end
@@ -58,6 +69,10 @@ function M.load(settings)
     crowd.createCrowd(100)
     border.createBorder(0,0)
 
+    M.score = 0
+    M.crowdCount = 0
+    M.initialPositionX = crowd.getPosition()
+
     M.world:setCallbacks(beginContact)
 end
 
@@ -79,9 +94,14 @@ function M.update(dt)
     doDestroy()
     startExplosions()
     crowd.updateAskedPosition()
-    bombs.createNextBombsIfNeeded(crowdPosX)
+    if crowdPosX then
+        bombs.createNextBombsIfNeeded(crowdPosX)
+    end
 
-    M.cam:setPosition(crowdPosX, crowdPosY)
+    M.recalculateStatistics()
+    if crowdPosX and crowdPosY then
+        M.cam:setPosition(crowdPosX, crowdPosY)
+    end
 end
 
 local function getSelectedForceVector(mouseX, mouseY)
@@ -119,14 +139,23 @@ local function drawSelectedForce()
     end
 end
 
+local font = love.graphics.newFont(20)
+local function drawHud()
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(font)
+    love.graphics.print('Score: ' .. tostring(M.score), 10, 10)
+    text = 'Population: ' .. tostring(M.crowdCount)
+    love.graphics.print(text, config.windowWidth - font:getWidth(text) - 10, 10)
+end
+
 function M.draw()
     M.cam:draw(function()
         for k, v in pairs(M.objects) do
             v.draw()
         end
-        love.graphics.print("Hello", 200, 200)
         drawSelectedForce()
     end)
+    drawHud()
 end
 
 function M.mousepressed(x, y, button)
