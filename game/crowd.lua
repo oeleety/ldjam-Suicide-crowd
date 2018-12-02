@@ -31,7 +31,7 @@ function M.updateAskedPosition()
             count = count + 1
         end)
 
-        if sumDist / count < 50 then
+        if sumDist / count < count / 2 then
             M.askedPosition = nil
         end
     end
@@ -39,9 +39,10 @@ end
 
 local function moveItem(item, dt)
     if M.askedPosition then
-        x, y = item.body:getPosition()
-        xDiff, yDiff = utils.normalizeVector(M.askedPosition.x - x, M.askedPosition.y - y)
-        item.body:setLinearVelocity(xDiff * dt * 10000, yDiff * dt * 10000)
+        local x, y = item.body:getPosition()
+        local xDiff, yDiff = utils.normalizeVector(M.askedPosition.x - x, M.askedPosition.y - y)
+        local c = dt * 3000 * math.pow(M.count, 1/3)
+        item.body:setLinearVelocity(xDiff * c, yDiff * c)
     else
         item.body:setLinearVelocity(0, 0)
     end
@@ -105,10 +106,10 @@ function M.getGuyAt(x, y)
     end)
 end
 
-function M.getCrowdCount()
-    local count = 0
-    iterateOverCrowd(function() count = count + 1 end)
-    return count
+function M.updateCrowdCount()
+    M.count = 0
+    iterateOverCrowd(function() M.count = M.count + 1 end)
+    return M.count
 end
 
 return M

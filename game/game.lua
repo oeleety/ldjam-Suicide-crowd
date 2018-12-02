@@ -10,7 +10,7 @@ local border = require("game/border").init(M)
 M.worldHeight = 800
 
 function M.recalculateStatistics()
-    M.crowdCount = crowd.getCrowdCount()
+    M.crowdCount = crowd.updateCrowdCount()
     if M.crowdCount == 0 then
         states.changeState('menu', {score=M.score})
     end
