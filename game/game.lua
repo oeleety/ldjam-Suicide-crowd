@@ -124,7 +124,7 @@ end
 
 local function getSelectedForceVector(mouseX, mouseY)
     local x, y = M.cam:toWorld(mouseX, mouseY)
-    local x, y = x - M.selected.body:getX(), y - M.selected.body:getY()
+    local x, y = x - M.objects[M.selected].body:getX(), y - M.objects[M.selected].body:getY()
     return x, y
 end
 
@@ -148,8 +148,9 @@ local function drawArrow(x1, y1, x2, y2)
 end
 
 local function drawSelectedForce()
-    if M.selected then
-        x, y = M.selected.body:getX(), M.selected.body:getY()
+    if M.selected and M.objects[M.selected] then
+        v = M.objects[M.selected]
+        x, y = v.body:getX(), v.body:getY()
         xDiff, yDiff = getSelectedForceVector(love.mouse.getPosition())
 
         love.graphics.setColor(0, 1, 1)
@@ -187,9 +188,10 @@ end
 
 function M.mousereleased(x, y, button)
     if button == 1 then
-        if M.selected then
-            M.selected.body:setLinearVelocity(getSelectedForceVector(x, y))
-            M.selected.isInCrowd = false
+        if M.selected and M.objects[M.selected] then
+            v = M.objects[M.selected]
+            v.body:setLinearVelocity(getSelectedForceVector(x, y))
+            v.isInCrowd = false
             screaming :play ()
             M.selected = nil
         end

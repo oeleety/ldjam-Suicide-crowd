@@ -132,7 +132,7 @@ function M.getGuyAt(x, y)
         local dist = utils.getVectorLen(x - xV, y - yV)
         if closestDist > dist then
             closestDist = dist
-            res = v
+            res = utils.getObjectId(v)
         end
     end, true)
 
