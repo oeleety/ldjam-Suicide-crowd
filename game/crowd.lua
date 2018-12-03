@@ -125,11 +125,18 @@ function M.getPosition()
 end
 
 function M.getGuyAt(x, y)
-    return iterateOverCrowd(function(v)
-        if v.fixture:testPoint(x, y) then
-            return v
+    local closestDist = 1e5
+    local res = nil
+    iterateOverCrowd(function(v)
+        local xV, yV = v.body:getPosition()
+        local dist = utils.getVectorLen(x - xV, y - yV)
+        if closestDist > dist then
+            closestDist = dist
+            res = v
         end
     end, true)
+
+    return res
 end
 
 function M.updateCrowdCount()
